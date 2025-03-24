@@ -14,10 +14,31 @@ from datetime import datetime
 import smtplib
 from email.mime.text import MIMEText
 from email.message import EmailMessage
+import requests
+
+# Remote admin list URL from GitHub
+ADMIN_LIST_URL = "https://raw.githubusercontent.com/Vishnu-Gollakaram/book_ipl_tickets_online/main/admins.txt"
 
 # Function to generate a random access token
 def generate_token(length=6):
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+
+# Function to fetch the latest admin list from GitHub
+def get_admins():
+    try:
+        response = requests.get(ADMIN_LIST_URL)
+        if response.status_code == 200:
+            return list(set(email.strip().lower() for email in response.text.split("\n") if email.strip()))
+        else:
+            print("⚠️ Failed to fetch admin list. Using last known admins.")
+            return list()
+    except Exception as e:
+        print(f"❌ Error fetching admin list: {e}")
+        return list()
+
+# Fetch latest admin list
+ADMINS = get_admins()
+print(f"📜 Current Admins: {ADMINS}")
 
 
 # Generate a token and send it via email
@@ -27,7 +48,7 @@ ACCESS_TOKEN = generate_token()
 sender_email = "vgollakaram3@gmail.com"
 app_password = "vgxu ygco rvlv tdeu"
 
-receiver_email = "vishnusrivardhan.g@gmail.com"
+receiver_email = ", ".join(ADMINS)
 subject = f"API Token email from Booking app {datetime.now()}"
 body = f"""
 API is as Below:
@@ -44,7 +65,7 @@ try:
     with smtplib.SMTP("smtp.gmail.com", 587) as server:
         server.starttls()  # Secure connection
         server.login(sender_email, app_password)
-        server.sendmail(sender_email, receiver_email, msg.as_string())
+        server.sendmail(sender_email, ADMINS, msg.as_string())
         print("✅ Email sent successfully!")
 except Exception as e:
     print(f"❌ Error: {e}")
@@ -156,7 +177,7 @@ try:
             # Open the new page
             driver.get(new_url)
 
-            WebDriverWait(driver, 30).until(EC.url_contains("/buy-page/shows/"))fsfgdgbsdgzxvbfzgdcvhxb srxzfbsgdzb sgdz srgd
+            WebDriverWait(driver, 30).until(EC.url_contains("/buy-page/shows/"))
             print("Redirected to:", driver.current_url)
 
             time.sleep(600)
