@@ -180,7 +180,7 @@ try:
             WebDriverWait(driver, 30).until(EC.url_contains("/buy-page/shows/"))
             print("Redirected to:", driver.current_url)
 
-            time.sleep(600)
+            time.sleep(6000)
             break
         except Exception as e:
             print(f"Exception occurred: {e}, retrying...")
